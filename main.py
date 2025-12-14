@@ -1,7 +1,8 @@
 import docker
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-
+from fastapi import WebSocket
+import asyncio
 
 app = FastAPI(title="DevOps Dashboard")
 client = docker.from_env() # Tizimdagi Docker bilan ulanadi
@@ -48,6 +49,31 @@ def stop_container(container_id: str):
         container = client.containers.get(container_id)
         container.stop()
         return {"message": f"Konteyner {container_id} to'xtatildi"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.websocket("/containers/{container_id}/logs")
+async def websocket_endpoint(websocket: WebSocket, container_id: str):
+    await websocket.accept()
+    try:
+        container = client.containers.get(container_id)
+        # Loglarni stream qilish (jonli oqim)
+        for line in container.logs(stream=True, tail=10):
+            await websocket.send_text(line.decode("utf-8"))
+            await asyncio.sleep(0.1) # Kichik pauza
+    except Exception as e:
+        await websocket.send_text(f"Error: {str(e)}")
+        await websocket.close()
+
+
+@app.get("/containers/{container_id}/stats")
+def get_stats(container_id: str):
+    try:
+        container = client.containers.get(container_id)
+        stats = container.stats(stream=False)
+        # Bu yerda Docker stats JSON qaytaradi, uni frontendda parslash kerak
+        return stats
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
