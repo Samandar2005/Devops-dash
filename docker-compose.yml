@@ -20,10 +20,12 @@ services:
   # 3-Servis: Backend (Django)
   backend:
     build: ./backend
-    command: python manage.py runserver 0.0.0.0:8000
+    # ESKI: command: python manage.py runserver 0.0.0.0:8000
+    # YANGI (ASGI):
+    command: daphne -b 0.0.0.0 -p 8000 config.asgi:application
     volumes:
-      - ./backend:/app  # Kodni jonli o'zgartirish uchun (Hot Reload)
-      - /var/run/docker.sock:/var/run/docker.sock # DIQQAT: Docker Socket Mount
+      - ./backend:/app
+      - /var/run/docker.sock:/var/run/docker.sock
     ports:
       - "8000:8000"
     env_file:
@@ -31,6 +33,7 @@ services:
     depends_on:
       - db
       - redis
+      
   celery_worker:
     build: ./backend
     # Worker ishga tushirish buyrug'i
