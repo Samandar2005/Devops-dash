@@ -31,6 +31,19 @@ services:
     depends_on:
       - db
       - redis
-
+  celery_worker:
+    build: ./backend
+    # Worker ishga tushirish buyrug'i
+    command: celery -A config worker --loglevel=info
+    volumes:
+      - ./backend:/app
+      - /var/run/docker.sock:/var/run/docker.sock # Worker ham Docker bilan gaplasha olishi SHART!
+    env_file:
+      - .env
+    depends_on:
+      - db
+      - redis
+      - backend
+      
 volumes:
   postgres_data:

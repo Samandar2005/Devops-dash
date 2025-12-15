@@ -2,7 +2,7 @@ from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-
+from .tasks import create_container_task
 from .models import Container
 from .serializers import ContainerSerializer
 from utils.docker_client import DockerManager
@@ -18,32 +18,15 @@ class ContainerViewSet(viewsets.ModelViewSet):
         return Container.objects.filter(owner=self.request.user)
 
     def perform_create(self, serializer):
-        """
-        1. DB ga yozish.
-        2. Docker konteynerni ko'tarish.
-        3. Agar Docker o'xshasa, container_id ni DB ga saqlash.
-        """
-        # Hozircha DB ga saqlab turamiz (Docker hali ishga tushmadi)
+        # 1. DB ga 'created' statusi bilan saqlaymiz
         instance = serializer.save(owner=self.request.user, status='created')
 
-        # Docker bilan ishlash
-        port_mapping = {instance.container_port: instance.host_port}
+        # 2. Og'ir ishni Celeryga berib yuboramiz (Async)
+        # .delay() metodi vazifani Redis navbatiga tashlaydi
+        create_container_task.delay(instance.id)
         
-        container_id = docker_manager.run_container(
-            image_name=instance.image,
-            container_name=instance.name,
-            port_mapping=port_mapping
-        )
-
-        if container_id:
-            instance.container_id = container_id
-            instance.status = 'running'
-            instance.save()
-        else:
-            # Agar Dockerda xato bo'lsa, DB dan ham o'chiramiz (Rollback)
-            instance.delete()
-            raise serializers.ValidationError({"error": "Docker konteynerini yaratib bo'lmadi. Image nomi to'g'rimi?"})
-
+        # 3. Biz kutib o'tirmaymiz, darhol javob qaytamiz!
+        
     @action(detail=True, methods=['post'])
     def stop(self, request, pk=None):
         """Konteynerni to'xtatish"""

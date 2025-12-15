@@ -166,3 +166,8 @@ SWAGGER_SETTINGS = {
 }
 
 CORS_ALLOW_ALL_ORIGINS = True
+
+CELERY_BROKER_URL = f"redis://{os.environ.get('REDIS_HOST')}:{os.environ.get('REDIS_PORT')}/0"
+CELERY_RESULT_BACKEND = f"redis://{os.environ.get('REDIS_HOST')}:{os.environ.get('REDIS_PORT')}/0"
+
+CELERY_RESULT_EXPIRES = 3600

@@ -10,3 +10,4 @@ gunicorn>=21.2
 django-cors-headers>=4.3     
 djangorestframework-simplejwt>=5.3 
 drf-yasg>=1.21                     
+celery>=5.3
