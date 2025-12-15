@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head><title>Mini PaaS</title></head>
+<body>
+    <h1>DevOps Dashboard</h1>
+    <button onclick="loadContainers()">Yangilash</button>
+    <ul id="list"></ul>
+
+    <script>
+        async function loadContainers() {
+            const res = await fetch('/containers');
+            const data = await res.json();
+            const list = document.getElementById('list');
+            list.innerHTML = '';
+            data.forEach(c => {
+                const li = document.createElement('li');
+                li.innerText = `${c.name} - ${c.status}`;
+                list.appendChild(li);
+            });
+        }
+        loadContainers();
+    </script>
+</body>
+</html>

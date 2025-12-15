@@ -1,11 +1,14 @@
 import docker
 from fastapi import FastAPI, HTTPException
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from fastapi import WebSocket
 import asyncio
 
 app = FastAPI(title="DevOps Dashboard")
 client = docker.from_env() # Tizimdagi Docker bilan ulanadi
+
+app.mount("/dashboard", StaticFiles(directory="static", html=True), name="static")
 
 @app.get("/containers")
 def list_containers():

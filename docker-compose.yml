@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  # 1-Servis: Ma'lumotlar bazasi
+  db:
+    image: postgres:15-alpine
+    restart: always
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    env_file:
+      - .env
+
+  # 2-Servis: Kesh va Navbat (Redis)
+  redis:
+    image: redis:7-alpine
+    restart: always
+    ports:
+      - "6379:6379"
+
+  # 3-Servis: Backend (Django)
+  backend:
+    build: ./backend
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./backend:/app  # Kodni jonli o'zgartirish uchun (Hot Reload)
+      - /var/run/docker.sock:/var/run/docker.sock # DIQQAT: Docker Socket Mount
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    depends_on:
+      - db
+      - redis
+
+volumes:
+  postgres_data:
