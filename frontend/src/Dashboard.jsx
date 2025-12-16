@@ -2,12 +2,19 @@ import { useEffect, useState } from 'react';
 import api from './api';
 import { useNavigate } from 'react-router-dom';
 import toast, { Toaster } from 'react-hot-toast';
+import LogViewer from './LogViewer';
 import { FaPlay, FaStop, FaTrash, FaTerminal, FaSync, FaSignOutAlt } from 'react-icons/fa';
+import StatsModal from './StatsModal'; // Yangi
+import { FaChartLine } from 'react-icons/fa'; // Yangi ikonka
+
 
 const Dashboard = () => {
+    const [selectedContainer, setSelectedContainer] = useState(null);
+    const [statsContainer, setStatsContainer] = useState(null); 
     const [containers, setContainers] = useState([]);
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
+    
 
     // 1. Konteynerlarni Backenddan yuklash
     const fetchContainers = async () => {
@@ -70,6 +77,7 @@ const Dashboard = () => {
     };
 
     return (
+        
         <div className="min-h-screen bg-gray-900 text-gray-100 font-sans">
             <Toaster position="top-right" />
             
@@ -172,6 +180,23 @@ const Dashboard = () => {
                                                     >
                                                         <FaTrash size={14} />
                                                     </button>
+
+                                                    <button 
+                                                        onClick={() => setSelectedContainer(c)} // <-- O'ZGARTIRILDI (Start/Stop dan keyin turadi)
+                                                        className="p-2 bg-gray-700 text-gray-200 rounded-lg hover:bg-gray-600 hover:text-white transition-colors shadow-lg"
+                                                        title="Loglarni ko'rish"
+                                                    >
+                                                        <FaTerminal size={14} />
+                                                    </button>
+
+                                                    <button 
+                                                        onClick={() => setStatsContainer(c)}
+                                                        className="p-2 bg-purple-600/20 text-purple-400 rounded-lg hover:bg-purple-600 hover:text-white transition-colors shadow-lg"
+                                                        title="Monitoring"
+                                                    >
+                                                        <FaChartLine size={14} />
+                                                    </button>
+
                                                 </div>
                                             </td>
                                         </tr>
@@ -181,9 +206,32 @@ const Dashboard = () => {
                         </table>
                     </div>
                 </div>
+
+                {selectedContainer && (
+                    <LogViewer 
+                        container={selectedContainer} 
+                        onClose={() => setSelectedContainer(null)} 
+                    />
+                )}
+
+
+                {/* Stats Modal (YANGI) */}
+                {statsContainer && (
+                    <StatsModal 
+                        container={statsContainer} 
+                        onClose={() => setStatsContainer(null)} 
+                    />
+                )}
+
             </main>
         </div>
+
+
     );
 };
+
+
+
+
 
 export default Dashboard;

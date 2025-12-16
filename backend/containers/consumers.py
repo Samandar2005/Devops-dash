@@ -65,3 +65,63 @@ class LogConsumer(AsyncWebsocketConsumer):
             print(f"Log stream error: {e}")
 
 
+class StatsConsumer(AsyncWebsocketConsumer):
+    async def connect(self):
+        await self.accept()
+        self.container_id = self.scope['url_route']['kwargs']['container_id']
+        self.keep_running = True
+        self.stats_task = asyncio.create_task(self.stream_stats())
+
+    async def disconnect(self, close_code):
+        self.keep_running = False
+        if hasattr(self, 'stats_task'):
+            self.stats_task.cancel()
+
+    async def stream_stats(self):
+        docker_manager = DockerManager()
+        loop = asyncio.get_running_loop()
+        container = await loop.run_in_executor(None, docker_manager.get_container, self.container_id)
+
+        if not container:
+            await self.close()
+            return
+
+        # Docker stats stream
+        stats_iterator = container.stats(stream=True, decode=True)
+        await loop.run_in_executor(None, self._read_stats_sync, stats_iterator)
+
+    def _read_stats_sync(self, iterator):
+        try:
+            for stat in iterator:
+                if not self.keep_running:
+                    break
+                
+                # --- CPU va RAM hisoblash formulasi ---
+                
+                # 1. CPU % hisoblash
+                cpu_delta = stat['cpu_stats']['cpu_usage']['total_usage'] - stat['precpu_stats']['cpu_usage']['total_usage']
+                system_delta = stat['cpu_stats']['system_cpu_usage'] - stat['precpu_stats']['system_cpu_usage']
+                
+                cpu_percent = 0.0
+                if system_delta > 0.0 and cpu_delta > 0.0:
+                    cpu_percent = (cpu_delta / system_delta) * len(stat['cpu_stats']['cpu_usage']['percpu_usage']) * 100.0
+
+                # 2. RAM Usage (MB)
+                memory_usage = stat['memory_stats']['usage'] / (1024 * 1024) # MB ga o'tkazish
+                memory_limit = stat['memory_stats']['limit'] / (1024 * 1024)
+                
+                # WebSocketga tayyor raqamni yuboramiz
+                data = {
+                    'cpu': round(cpu_percent, 2),
+                    'memory': round(memory_usage, 2),
+                    'memory_limit': round(memory_limit, 2)
+                }
+
+                asyncio.run_coroutine_threadsafe(
+                    self.send(text_data=json.dumps(data)),
+                    asyncio.get_event_loop()
+                )
+        except Exception as e:
+            print(f"Stats error: {e}")
+
+
