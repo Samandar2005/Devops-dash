@@ -48,5 +48,17 @@ services:
       - redis
       - backend
       
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:5173" # Brauzerda 3000 portda ochiladi
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules # Muhim: node_modules konteyner ichida qolishi kerak
+    environment:
+      - VITE_API_URL=http://localhost:8000
+    depends_on:
+      - backend    
+      
 volumes:
   postgres_data:
