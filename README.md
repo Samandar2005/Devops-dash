@@ -15,19 +15,37 @@
 - **🌐 WebSocket Integration**: Real-time updates via Django Channels for logs and monitoring data.
 
 ## 🛠 Tech Stack
-### Backend & System
+
+### 🧠 Backend & System
 ![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
 ![Django](https://img.shields.io/badge/Django-092E20?style=for-the-badge&logo=django&logoColor=white)
-![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
+![Django REST](https://img.shields.io/badge/DRF-ff1709?style=for-the-badge&logo=django&logoColor=white)
+![Django Channels](https://img.shields.io/badge/Channels-4.0+-purple?style=for-the-badge)
 ![Celery](https://img.shields.io/badge/Celery-37814A?style=for-the-badge&logo=celery&logoColor=white)
-![Redis](https://img.shields.io/badge/redis-%23DD0031.svg?style=for-the-badge&logo=redis&logoColor=white)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)
 
-### Frontend & UI
+### ⚙️ Infrastructure & Integration
+![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
+![Docker Compose](https://img.shields.io/badge/Docker_Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white)
+![Docker SDK](https://img.shields.io/badge/Docker_SDK-6.1+-blue?style=for-the-badge)
+![Unix Socket](https://img.shields.io/badge/Unix_Socket-Enabled-lightgrey?style=for-the-badge)
+![Nginx](https://img.shields.io/badge/Nginx-009639?style=for-the-badge&logo=nginx&logoColor=white)
+
+### 🗄 Database & Cache
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)
+![Redis](https://img.shields.io/badge/Redis-DD0031?style=for-the-badge&logo=redis&logoColor=white)
+
+### 🎨 Frontend & UI
 ![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
-![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
 ![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
+![Axios](https://img.shields.io/badge/Axios-5A29E4?style=for-the-badge)
+![React Router](https://img.shields.io/badge/React_Router-CA4245?style=for-the-badge&logo=react-router&logoColor=white)
+
+### 📊 Advanced UI & Monitoring
 ![Xterm.js](https://img.shields.io/badge/Xterm.js-Terminal-black?style=for-the-badge)
+![Recharts](https://img.shields.io/badge/Recharts-22B5BF?style=for-the-badge)
+![React Hot Toast](https://img.shields.io/badge/React_Hot_Toast-FFB703?style=for-the-badge)
+
 ## 🏗 System Architecture
 
 The Mini-PaaS platform consists of a **React frontend** for the user interface, a **Django backend** handling API requests and WebSocket connections, and **Celery workers** for asynchronous tasks. Docker SDK integrates directly with the host's Docker Engine via Unix sockets for container operations. Redis serves as both a message broker for Celery and a cache for real-time data. The system supports multi-stage Docker builds for efficient deployment and optional Nginx for production serving.
